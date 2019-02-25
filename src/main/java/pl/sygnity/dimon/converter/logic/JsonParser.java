@@ -22,7 +22,7 @@ public class JsonParser {
 	private String fullURL;
 	private HttpURLConnection request;
 
-	public Double getConverter(String currency) {
+	public Double getConverterValue(String currency) {
 		for (CurrencyTable table: CurrencyTable.values()) {
 			fullURL = baseURL + table + "/" + currency;
 			logger.info("Connecting to: " + fullURL);
@@ -59,11 +59,12 @@ public class JsonParser {
 	
 	
 	public void connect() {
-		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
+//		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
 		URL url;
 		try {
 			url = new URL(fullURL);
-			this.request = (HttpURLConnection) url.openConnection(proxy);
+//			this.request = (HttpURLConnection) url.openConnection(proxy);
+			this.request = (HttpURLConnection) url.openConnection();
 			this.request.setRequestProperty("Accept", "application/json");
 			this.request.connect();
 		} catch (MalformedURLException e) {

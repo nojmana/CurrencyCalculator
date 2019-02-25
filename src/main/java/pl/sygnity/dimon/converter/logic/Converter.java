@@ -14,8 +14,8 @@ public class Converter {
 	private Double value;
 	private String currency;
 	private LocalDate date;
-	private Double convertedValue;
 	private Double converter;
+	private Double convertedValue;
 	
 	private JsonParser jsonParser;
 	
@@ -78,15 +78,14 @@ public class Converter {
 	}
 
 	public Double convert() {
-		logger.info("Converting " + this.value + " from currency " + this.currency/* + " on date " + this.date*/);
 		this.convertedValue = this.value;
 		
 		if (!this.currency.equals("EUR")) {
-			Double converterEUR = this.jsonParser.getConverter("EUR");
+			Double converterEUR = this.jsonParser.getConverterValue("EUR");
 			this.convertedValue /= converterEUR;
 		}
 		
-		this.converter = this.jsonParser.getConverter(this.currency);
+		this.converter = this.jsonParser.getConverterValue(this.currency);
 		this.convertedValue *= converter;
 		
 		logger.info("Converted to: " + convertedValue);
