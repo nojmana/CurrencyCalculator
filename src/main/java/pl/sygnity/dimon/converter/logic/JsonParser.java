@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,9 +24,10 @@ public class JsonParser {
 	private String fullURL;
 	private HttpURLConnection request;
 
-	public Double getConverterValue(String currency) {
+	public Double getConverterValue(String currency, LocalDate date) {
 		for (CurrencyTable table: CurrencyTable.values()) {
-			fullURL = baseURL + table + "/" + currency;
+			
+			fullURL = baseURL + table + "/" + currency + "/" + formatDate(date);
 			logger.info("Connecting to: " + fullURL);
 
 			connect();
@@ -49,7 +52,7 @@ public class JsonParser {
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject item = array.getJSONObject(i);
 				Double converter = (Double) item.get("mid");
-				logger.info("Converter to currency " + currency + ": " + converter);
+				logger.info(currency + " converter: " + converter);
 				return Double.valueOf(converter);
 			}
 			
@@ -59,12 +62,12 @@ public class JsonParser {
 	
 	
 	public void connect() {
-//		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
+		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
 		URL url;
 		try {
 			url = new URL(fullURL);
-//			this.request = (HttpURLConnection) url.openConnection(proxy);
-			this.request = (HttpURLConnection) url.openConnection();
+			this.request = (HttpURLConnection) url.openConnection(proxy);
+//			this.request = (HttpURLConnection) url.openConnection();
 			this.request.setRequestProperty("Accept", "application/json");
 			this.request.connect();
 		} catch (MalformedURLException e) {
@@ -76,5 +79,10 @@ public class JsonParser {
 		}
 	}
 	
+	public String formatDate(LocalDate date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		String formattedString = date.format(formatter);
+		return formattedString;
+	}
 	
 }

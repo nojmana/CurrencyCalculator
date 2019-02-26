@@ -2,11 +2,12 @@ package pl.sygnity.dimon.converter.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import pl.sygnity.dimon.converter.dao.Database;
 import pl.sygnity.dimon.converter.logic.Converter;
 
 @RestController
@@ -14,15 +15,19 @@ import pl.sygnity.dimon.converter.logic.Converter;
 public class ConverterController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConverterController.class);
-
-	@RequestMapping(path = "/{value}") 
-	public Converter converter(@PathVariable String value, 
-			@RequestParam(value = "currency", defaultValue = "PLN") String currency/*, String date*/) {
+	
+	@Autowired
+	private Database database;
+	
+	@RequestMapping(path = "/{currencyName}/{value}/{date}") 
+	public Converter converter(@PathVariable String currencyName, @PathVariable String value, @PathVariable String date) {
+		logger.info("Currency: " + currencyName);
 		logger.info("Value: " + value);
-		logger.info("Currency: " + currency);
-//		logger.debug("Date: ", date);
+		logger.info("Date: " + date);
 		
-//		return new Converter(value, currency, date);
-		return new Converter(value, currency);
+		Converter converter = new Converter(value, currencyName, date);
+//		Database database = new Database(currencyRepository, rateRepository);
+		converter.setDatabase(database);
+		return new Converter(value, currencyName, date);
 	}
 }

@@ -7,34 +7,40 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.sygnity.dimon.converter.dao.Currency;
+import pl.sygnity.dimon.converter.dao.Database;
+import pl.sygnity.dimon.converter.dao.Rate;
+
 public class Converter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Converter.class);
 	
+	private Rate rate;	
+	private JsonParser jsonParser;
+	private Database database;
+	
 	private Double value;
-	private String currency;
-	private LocalDate date;
-	private Double converter;
 	private Double convertedValue;
 	
-	private JsonParser jsonParser;
-	
-	public Converter(String value, String currency) {
-		this.value = Double.parseDouble(value);
-		this.currency = currency;
-		this.jsonParser = new JsonParser();
+	public Converter(String value, String currencyName, String date) {
+		this.rate = new Rate();
+		
+		this.rate.setCurrency(new Currency(currencyName));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+		this.rate.setDate(LocalDate.parse(date, formatter));
 
+		this.jsonParser = new JsonParser();
+		this.value = Double.parseDouble(value);
+		
 		this.convertedValue = this.convert();
 	}
 	
-	public Converter(String value, String currency, String date) {
-		this.value = Double.parseDouble(value);
-		this.currency = currency;
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
-		this.date = LocalDate.parse(date, formatter);
-		this.jsonParser = new JsonParser();
-		
-		this.convertedValue = this.convert();
+	public Rate getRate() {
+		return rate;
+	}
+
+	public void setRate(Rate rate) {
+		this.rate = rate;
 	}
 
 	public Double getValue() {
@@ -44,23 +50,15 @@ public class Converter {
 	public void setValue(Double value) {
 		this.value = value;
 	}
-
-	public String getCurrency() {
-		return currency;
-	}
-
-	public void setCurrency(String currency) {
-		this.currency = currency;
-	}
-
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
 	
+	public Database getDatabase() {
+		return database;
+	}
+
+	public void setDatabase(Database database) {
+		this.database = database;
+	}
+
 	public Double getConvertedValue() {
 		return convertedValue;
 	}
@@ -69,24 +67,22 @@ public class Converter {
 		this.convertedValue = convertedValue;
 	}
 
-	public Double getConverter() {
-		return converter;
-	}
-
-	public void setConverter(Double converter) {
-		this.converter = converter;
-	}
-
 	public Double convert() {
 		this.convertedValue = this.value;
 		
-		if (!this.currency.equals("EUR")) {
-			Double converterEUR = this.jsonParser.getConverterValue("EUR");
-			this.convertedValue /= converterEUR;
+		if (!this.rate.getCurrency().getCurrencyName().equals("EUR")) {
+			Rate rateEur = new Rate();
+			rateEur.setCurrency(new Currency("EUR"));
+			rateEur.setConverter(this.jsonParser.getConverterValue("EUR", this.rate.getDate()));
+			
+//			this.database.addCurrency(rateEur.getCurrency());
+//			this.database.addRate(rateEur);
+			
+			this.convertedValue /= rateEur.getConverter();
 		}
 		
-		this.converter = this.jsonParser.getConverterValue(this.currency);
-		this.convertedValue *= converter;
+		this.rate.setConverter(this.jsonParser.getConverterValue(this.rate.getCurrency().getCurrencyName(), this.rate.getDate()));
+		this.convertedValue *= this.rate.getConverter();
 		
 		logger.info("Converted to: " + convertedValue);
 		
