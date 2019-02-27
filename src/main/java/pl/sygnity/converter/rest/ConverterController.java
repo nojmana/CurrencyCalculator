@@ -20,7 +20,7 @@ public class ConverterController {
 	private Database database;
 	
 	@RequestMapping(path = "/{currencyName}/{value}/{date}") 
-	public void converter(@PathVariable String currencyName, @PathVariable String value, @PathVariable String date) {
+	public Converter converter(@PathVariable String currencyName, @PathVariable String value, @PathVariable String date) {
 		logger.info("Currency: " + currencyName);
 		logger.info("Value: " + value);
 		logger.info("Date: " + date);
@@ -28,5 +28,7 @@ public class ConverterController {
 		Converter converter = new Converter(value, currencyName, date);
 		converter.setDatabase(database);
 		converter.convert();
+		
+		return converter;
 	}
 }

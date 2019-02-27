@@ -15,30 +15,24 @@ public class Converter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Converter.class);
 	
-	private Rate rate;	
+	private LocalDate date;
+	private String currencyName;
+	private Double value;
+	
 	private JsonParser jsonParser;
 	private Database database;
 	
-	private Double value;
 	private Double convertedValue;
 	
 	public Converter(String value, String currencyName, String date) {
-		this.rate = new Rate();
+		this.currencyName = currencyName;
 		
-		this.rate.setCurrency(new Currency(currencyName));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
-		this.rate.setDate(LocalDate.parse(date, formatter));
+		this.date = LocalDate.parse(date, formatter);
+		
+		this.value = Double.parseDouble(value);
 
 		this.jsonParser = new JsonParser();
-		this.value = Double.parseDouble(value);
-	}
-	
-	public Rate getRate() {
-		return rate;
-	}
-
-	public void setRate(Rate rate) {
-		this.rate = rate;
 	}
 
 	public Double getValue() {
@@ -67,24 +61,43 @@ public class Converter {
 
 	public void convert() {
 		this.convertedValue = this.value;
-		
-		if (!this.rate.getCurrency().getCurrencyName().equals("EUR")) {
-			Rate rateEur = new Rate();
-			rateEur.setCurrency(new Currency("EUR"));
-			rateEur.setConverter(this.jsonParser.getConverterValue("EUR", this.rate.getDate()));
-			
-			rate.getCurrency();
-			this.database.toString();
-			this.database.addCurrency(rateEur.getCurrency());
-			this.database.addRate(rateEur);
-			
-			this.convertedValue /= rateEur.getConverter();
+		logger.info("Converter.convert()");
+
+		if (!this.currencyName.equals("EUR")) {
+			logger.info("CurrencyName != EUR");
+			this.convertedValue /= this.getConverter("EUR", this.date);
 		}
-		
-		this.rate.setConverter(this.jsonParser.getConverterValue(this.rate.getCurrency().getCurrencyName(), this.rate.getDate()));
-		this.convertedValue *= this.rate.getConverter();
-		
+
+		this.convertedValue *= this.getConverter(this.currencyName, this.date);
 		logger.info("Converted to: " + convertedValue);
+	}
+	
+	public Double getConverter(String currencyName, LocalDate date) {
+		Rate rate = new Rate();
+		Currency currency = new Currency(currencyName);
+		rate.setDate(date);
+		
+		Integer currencyId = this.database.findCurrencyIdInDatabase(currencyName);
+		
+		if (currencyId == 0) { //there's no such CURRENCY in database, so there's no RATE
+			logger.info("No " + currencyName + " currency in database");
+			rate.setConverter(this.jsonParser.getConverterValue(currencyName, date));
+			rate.setCurrency(currency);
+
+			this.database.addCurrency(currency);
+			this.database.addRate(rate);
+			
+		} else { //there's such CURRENCY in database, but there may not be RATE
+			logger.info(currencyName + " currency in database");
+			rate.setCurrency(this.database.findCurrencyInDatabase(currencyName));
+			rate.setConverter(this.database.findConverterInDatabase(currencyId, date));
+			if (rate.getConverter() == 0) { // there's no RATE in database
+				logger.info("No " + currencyName + "  rate in database");
+				rate.setConverter(this.jsonParser.getConverterValue(currencyName, date));
+				this.database.addRate(rate);
+			}
+		}
+		return rate.getConverter();
 	}
 	
 	

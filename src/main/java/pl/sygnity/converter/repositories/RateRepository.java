@@ -1,11 +1,16 @@
 package pl.sygnity.converter.repositories;
 
+import java.time.LocalDate;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 
 import pl.sygnity.converter.entities.Rate;
 
-@Repository
 public interface RateRepository extends CrudRepository<Rate, Long> {
+
+	@Query(value = "SELECT R.CONVERTER FROM RATE R WHERE R.CURRENCY_ID = :currencyId and R.DATE = :date", nativeQuery = true)
+	Double findRateByCurrencyAndDate(@Param("currencyId") Integer currencyId, @Param("date") LocalDate date);
 
 }
