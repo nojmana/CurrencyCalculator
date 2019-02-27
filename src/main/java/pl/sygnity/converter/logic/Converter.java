@@ -15,24 +15,30 @@ public class Converter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Converter.class);
 	
-	private LocalDate date;
 	private String currencyName;
 	private Double value;
+	private LocalDate date;
 	
-	private JsonParser jsonParser;
+	private NbpApiHandler jsonParser;
 	private Database database;
 	
 	private Double convertedValue;
 	
 	public Converter(String value, String currencyName, String date) {
 		this.currencyName = currencyName;
-		
+		this.value = Double.parseDouble(value);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 		this.date = LocalDate.parse(date, formatter);
 		
-		this.value = Double.parseDouble(value);
+		this.jsonParser = new NbpApiHandler();
+	}
+	
+	public String getCurrencyName() {
+		return currencyName;
+	}
 
-		this.jsonParser = new JsonParser();
+	public void setCurrencyName(String currencyName) {
+		this.currencyName = currencyName;
 	}
 
 	public Double getValue() {
@@ -43,6 +49,14 @@ public class Converter {
 		this.value = value;
 	}
 	
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
 	public Database getDatabase() {
 		return database;
 	}
@@ -61,18 +75,17 @@ public class Converter {
 
 	public void convert() {
 		this.convertedValue = this.value;
-		logger.info("Converter.convert()");
 
 		if (!this.currencyName.equals("EUR")) {
 			logger.info("CurrencyName != EUR");
-			this.convertedValue /= this.getConverter("EUR", this.date);
+			this.convertedValue /= this.getConverterValue("EUR", this.date);
 		}
 
-		this.convertedValue *= this.getConverter(this.currencyName, this.date);
+		this.convertedValue *= this.getConverterValue(this.currencyName, this.date);
 		logger.info("Converted to: " + convertedValue);
 	}
 	
-	public Double getConverter(String currencyName, LocalDate date) {
+	public Double getConverterValue(String currencyName, LocalDate date) {
 		Rate rate = new Rate();
 		Currency currency = new Currency(currencyName);
 		rate.setDate(date);
@@ -89,6 +102,7 @@ public class Converter {
 			
 		} else { //there's such CURRENCY in database, but there may not be RATE
 			logger.info(currencyName + " currency in database");
+			this.database.findCurrencyInDatabase(currencyName);
 			rate.setCurrency(this.database.findCurrencyInDatabase(currencyName));
 			rate.setConverter(this.database.findConverterInDatabase(currencyId, date));
 			if (rate.getConverter() == 0) { // there's no RATE in database

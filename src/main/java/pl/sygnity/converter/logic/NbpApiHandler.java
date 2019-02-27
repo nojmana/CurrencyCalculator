@@ -16,46 +16,42 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonParser {
+public class NbpApiHandler {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Converter.class);
 	
-	private String baseURL = "http://api.nbp.pl/api/exchangerates/rates/";
+	private String baseURL = "http://api.nbp.pl/api/exchangerates/rates/A/";
 	private String fullURL;
 	private HttpURLConnection request;
 
-	public Double getConverterValue(String currency, LocalDate date) {
-		for (CurrencyTable table: CurrencyTable.values()) {
-			
-			fullURL = baseURL + table + "/" + currency + "/" + formatDate(date);
-			logger.info("Connecting to: " + fullURL);
+	public Double getConverterValue(String currency, LocalDate date) {			
+		fullURL = baseURL + currency + "/" + formatDate(date);
+		logger.info("Connecting to: " + fullURL);
 
-			connect();
+		connect();
 
-	        BufferedReader reader;
-	        String json = "";
-			try {
-				reader = new BufferedReader(new InputStreamReader(this.request.getInputStream()));
-		        json = new String();
-		        String line;
-		        while ((line = reader.readLine()) != null) {
-		        	json += line + "\n";
-		        }
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		BufferedReader reader;
+		String json = "";
+		try {
+			reader = new BufferedReader(new InputStreamReader(this.request.getInputStream()));
+			json = new String();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				json += line + "\n";
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-			JSONObject obj = new JSONObject(json);
-			JSONArray array = obj.getJSONArray("rates");
+		JSONObject obj = new JSONObject(json);
+		JSONArray array = obj.getJSONArray("rates");
 			
-			for (int i = 0; i < array.length(); i++) {
-				JSONObject item = array.getJSONObject(i);
-				Double converter = (Double) item.get("mid");
-				logger.info(currency + " converter: " + converter);
-				return Double.valueOf(converter);
-			}
-			
+		for (int i = 0; i < array.length();) {
+			JSONObject item = array.getJSONObject(i);
+			Double converter = (Double) item.get("mid");
+			logger.info(currency + " converter: " + converter);
+			return Double.valueOf(converter);
 		}
 		return Double.valueOf(0);
 	}
@@ -66,8 +62,8 @@ public class JsonParser {
 		URL url;
 		try {
 			url = new URL(fullURL);
-			this.request = (HttpURLConnection) url.openConnection(proxy);
-//			this.request = (HttpURLConnection) url.openConnection();
+//			this.request = (HttpURLConnection) url.openConnection(proxy);
+			this.request = (HttpURLConnection) url.openConnection();
 			this.request.setRequestProperty("Accept", "application/json");
 			this.request.connect();
 		} catch (MalformedURLException e) {
