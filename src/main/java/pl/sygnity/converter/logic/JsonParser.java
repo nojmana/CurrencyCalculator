@@ -1,4 +1,4 @@
-package pl.sygnity.dimon.converter.logic;
+package pl.sygnity.converter.logic;
 
 import java.io.BufferedReader;
 import java.io.IOException;

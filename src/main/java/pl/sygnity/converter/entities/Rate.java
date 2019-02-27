@@ -1,14 +1,16 @@
-package pl.sygnity.dimon.converter.dao;
+package pl.sygnity.converter.entities;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+@Entity
 public class Rate {
 	
 	@Id
@@ -17,7 +19,6 @@ public class Rate {
 	
     @ManyToOne
     @JoinColumn
-	@Column(nullable=false) 
 	private Currency currency;
 	
 	@Column(nullable=false)

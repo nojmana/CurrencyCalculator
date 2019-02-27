@@ -1,4 +1,4 @@
-package pl.sygnity.dimon.converter.dao;
+package pl.sygnity.converter.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

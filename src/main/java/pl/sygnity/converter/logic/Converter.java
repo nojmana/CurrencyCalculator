@@ -1,4 +1,4 @@
-package pl.sygnity.dimon.converter.logic;
+package pl.sygnity.converter.logic;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -7,9 +7,9 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pl.sygnity.dimon.converter.dao.Currency;
-import pl.sygnity.dimon.converter.dao.Database;
-import pl.sygnity.dimon.converter.dao.Rate;
+import pl.sygnity.converter.dao.Database;
+import pl.sygnity.converter.entities.Currency;
+import pl.sygnity.converter.entities.Rate;
 
 public class Converter {
 	
@@ -31,8 +31,6 @@ public class Converter {
 
 		this.jsonParser = new JsonParser();
 		this.value = Double.parseDouble(value);
-		
-		this.convertedValue = this.convert();
 	}
 	
 	public Rate getRate() {
@@ -67,7 +65,7 @@ public class Converter {
 		this.convertedValue = convertedValue;
 	}
 
-	public Double convert() {
+	public void convert() {
 		this.convertedValue = this.value;
 		
 		if (!this.rate.getCurrency().getCurrencyName().equals("EUR")) {
@@ -75,8 +73,10 @@ public class Converter {
 			rateEur.setCurrency(new Currency("EUR"));
 			rateEur.setConverter(this.jsonParser.getConverterValue("EUR", this.rate.getDate()));
 			
-//			this.database.addCurrency(rateEur.getCurrency());
-//			this.database.addRate(rateEur);
+			rate.getCurrency();
+			this.database.toString();
+			this.database.addCurrency(rateEur.getCurrency());
+			this.database.addRate(rateEur);
 			
 			this.convertedValue /= rateEur.getConverter();
 		}
@@ -85,9 +85,6 @@ public class Converter {
 		this.convertedValue *= this.rate.getConverter();
 		
 		logger.info("Converted to: " + convertedValue);
-		
-		return this.convertedValue;
-		
 	}
 	
 	
