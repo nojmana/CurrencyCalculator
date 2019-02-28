@@ -22,18 +22,21 @@ public class NbpApiHandler {
 	
 	private String baseURL = "http://api.nbp.pl/api/exchangerates/rates/A/";
 	private String fullURL;
-	private HttpURLConnection request;
 
 	public Double getConverterValue(String currency, LocalDate date) {			
 		fullURL = baseURL + currency + "/" + formatDate(date);
 		logger.info("Connecting to: " + fullURL);
 
-		connect();
+		HttpURLConnection request = connect();
 
+		if (request == null) {
+			return Double.valueOf(0);
+		}
+		
 		BufferedReader reader;
 		String json = "";
 		try {
-			reader = new BufferedReader(new InputStreamReader(this.request.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
 			json = new String();
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -57,15 +60,16 @@ public class NbpApiHandler {
 	}
 	
 	
-	public void connect() {
+	public HttpURLConnection connect() {
 		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
 		URL url;
+		HttpURLConnection request = null;
 		try {
-			url = new URL(fullURL);
-//			this.request = (HttpURLConnection) url.openConnection(proxy);
-			this.request = (HttpURLConnection) url.openConnection();
-			this.request.setRequestProperty("Accept", "application/json");
-			this.request.connect();
+			url = new URL(this.fullURL);
+			request = (HttpURLConnection) url.openConnection(proxy);
+//			request = (HttpURLConnection) url.openConnection();
+			request.setRequestProperty("Accept", "application/json");
+			request.connect();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,6 +77,7 @@ public class NbpApiHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return request;
 	}
 	
 	public String formatDate(LocalDate date) {

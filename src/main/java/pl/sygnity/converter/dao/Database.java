@@ -3,7 +3,7 @@ package pl.sygnity.converter.dao;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import pl.sygnity.converter.entities.Currency;
 import pl.sygnity.converter.entities.Rate;
@@ -11,7 +11,7 @@ import pl.sygnity.converter.repositories.CurrencyRepository;
 import pl.sygnity.converter.repositories.RateRepository;
 
 
-@Component
+@Service
 public class Database {
 
 	@Autowired
@@ -23,8 +23,8 @@ public class Database {
 		this.currencyRepository.save(currency);
 	}
 	
-	public Currency findCurrencyInDatabase(String currencyName) {
-		Currency currency = this.currencyRepository.findCurrencyByName(currencyName);
+	public Currency findCurrencyInDatabase(Integer currencyId) {
+		Currency currency = this.currencyRepository.findCurrencyById(currencyId);
 		return currency;
 	}
 	

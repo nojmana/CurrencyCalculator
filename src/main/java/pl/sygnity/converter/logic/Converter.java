@@ -1,5 +1,6 @@
 package pl.sygnity.converter.logic;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -19,7 +20,7 @@ public class Converter {
 	private Double value;
 	private LocalDate date;
 	
-	private NbpApiHandler jsonParser;
+	private NbpApiHandler nbpApiHandler;
 	private Database database;
 	
 	private Double convertedValue;
@@ -28,9 +29,13 @@ public class Converter {
 		this.currencyName = currencyName;
 		this.value = Double.parseDouble(value);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
-		this.date = LocalDate.parse(date, formatter);
+		try {
+			this.date = LocalDate.parse(date, formatter);
+		} catch (DateTimeException e) {
+			throw new RuntimeException("Error while parsing date");
+		}
 		
-		this.jsonParser = new NbpApiHandler();
+		this.nbpApiHandler = new NbpApiHandler();
 	}
 	
 	public String getCurrencyName() {
@@ -87,27 +92,26 @@ public class Converter {
 	
 	public Double getConverterValue(String currencyName, LocalDate date) {
 		Rate rate = new Rate();
-		Currency currency = new Currency(currencyName);
 		rate.setDate(date);
+		Currency currency = new Currency(currencyName);
 		
 		Integer currencyId = this.database.findCurrencyIdInDatabase(currencyName);
 		
-		if (currencyId == 0) { //there's no such CURRENCY in database, so there's no RATE
+		if (currencyId == 0) {
 			logger.info("No " + currencyName + " currency in database");
-			rate.setConverter(this.jsonParser.getConverterValue(currencyName, date));
+			rate.setConverter(this.nbpApiHandler.getConverterValue(currencyName, date));
 			rate.setCurrency(currency);
-
+			
 			this.database.addCurrency(currency);
 			this.database.addRate(rate);
-			
-		} else { //there's such CURRENCY in database, but there may not be RATE
+		} else {
 			logger.info(currencyName + " currency in database");
-			this.database.findCurrencyInDatabase(currencyName);
-			rate.setCurrency(this.database.findCurrencyInDatabase(currencyName));
 			rate.setConverter(this.database.findConverterInDatabase(currencyId, date));
-			if (rate.getConverter() == 0) { // there's no RATE in database
+			rate.setCurrency(this.database.findCurrencyInDatabase(currencyId));
+			
+			if (rate.getConverter().compareTo(Double.valueOf(0)) > 0 ? true : false) {
 				logger.info("No " + currencyName + "  rate in database");
-				rate.setConverter(this.jsonParser.getConverterValue(currencyName, date));
+				rate.setConverter(this.nbpApiHandler.getConverterValue(currencyName, date));
 				this.database.addRate(rate);
 			}
 		}
