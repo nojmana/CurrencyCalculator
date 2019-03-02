@@ -5,8 +5,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import javax.persistence.Access;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import pl.sygnity.converter.dao.Database;
 import pl.sygnity.converter.entities.Currency;
@@ -16,50 +21,38 @@ public class Converter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Converter.class);
 	
+	@JsonProperty
 	private String currencyName;
+	@JsonProperty
 	private Double value;
+	@JsonProperty
 	private LocalDate date;
 	
 	private NbpApiHandler nbpApiHandler;
+	@JsonIgnore
 	private Database database;
 	
+	@JsonProperty
 	private Double convertedValue;
+	
 	
 	public Converter(String value, String currencyName, String date) {
 		this.currencyName = currencyName;
-		this.value = Double.parseDouble(value);
+		try {
+			this.value = Double.parseDouble(value);
+		} catch (NumberFormatException e) {
+			MyException myException = new MyException(400, "Error while parsing value", e);
+			throw myException;
+		}		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 		try {
 			this.date = LocalDate.parse(date, formatter);
 		} catch (DateTimeException e) {
-			throw new RuntimeException("Error while parsing date");
+			MyException myException = new MyException(400, "Error while parsing date", e);
+			throw myException;
 		}
 		
 		this.nbpApiHandler = new NbpApiHandler();
-	}
-	
-	public String getCurrencyName() {
-		return currencyName;
-	}
-
-	public void setCurrencyName(String currencyName) {
-		this.currencyName = currencyName;
-	}
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
-	
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
 	}
 
 	public Database getDatabase() {
@@ -108,8 +101,8 @@ public class Converter {
 			logger.info(currencyName + " currency in database");
 			rate.setConverter(this.database.findConverterInDatabase(currencyId, date));
 			rate.setCurrency(this.database.findCurrencyInDatabase(currencyId));
-			
-			if (rate.getConverter().compareTo(Double.valueOf(0)) > 0 ? true : false) {
+
+			if (rate.getConverter().compareTo(Double.valueOf(0)) > 0 ? false : true) {
 				logger.info("No " + currencyName + "  rate in database");
 				rate.setConverter(this.nbpApiHandler.getConverterValue(currencyName, date));
 				this.database.addRate(rate);

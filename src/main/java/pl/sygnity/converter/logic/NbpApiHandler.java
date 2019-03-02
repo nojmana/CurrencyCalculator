@@ -2,6 +2,7 @@ package pl.sygnity.converter.logic;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -27,24 +28,27 @@ public class NbpApiHandler {
 		fullURL = baseURL + currency + "/" + formatDate(date);
 		logger.info("Connecting to: " + fullURL);
 
-		HttpURLConnection request = connect();
-
-		if (request == null) {
-			return Double.valueOf(0);
+		HttpURLConnection request = connectToAPI();
+		InputStream inputStream;
+		try {
+			inputStream = request.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new MyException(404, "Cannot access API at given URL", e);
 		}
-		
+
 		BufferedReader reader;
 		String json = "";
+		reader = new BufferedReader(new InputStreamReader(inputStream));
+		json = new String();
+		String line;
 		try {
-			reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			json = new String();
-			String line;
 			while ((line = reader.readLine()) != null) {
 				json += line + "\n";
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new MyException(404, "Error while parsing JSON", e);
 		}
 
 		JSONObject obj = new JSONObject(json);
@@ -60,7 +64,7 @@ public class NbpApiHandler {
 	}
 	
 	
-	public HttpURLConnection connect() {
+	public HttpURLConnection connectToAPI() {
 		Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.56.3.1", 8080));
 		URL url;
 		HttpURLConnection request = null;
@@ -71,11 +75,11 @@ public class NbpApiHandler {
 			request.setRequestProperty("Accept", "application/json");
 			request.connect();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new MyException(404, "Malformed URL", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new MyException(404, "Cannot access API at given URL", e);
 		}
 		return request;
 	}

@@ -16,12 +16,12 @@ public class Currency {
 	private Integer id;
 	
 	@Column(nullable=false)
-	private String currencyName;
+	private String name;
 	
 	public Currency() {}
 
-	public Currency(String currencyName) {
-		this.currencyName = currencyName;
+	public Currency(String name) {
+		this.name = name;
 	}
 
 	public Integer getId() {
@@ -32,11 +32,11 @@ public class Currency {
 		this.id = id;
 	}
 
-	public String getCurrencyName() {
-		return currencyName;
+	public String getname() {
+		return name;
 	}
 
-	public void setCurrencyName(String currencyName) {
-		this.currencyName = currencyName;
+	public void setName(String name) {
+		this.name = name;
 	}
 }
