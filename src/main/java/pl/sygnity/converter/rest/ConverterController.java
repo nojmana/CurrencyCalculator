@@ -27,8 +27,8 @@ public class ConverterController {
 		logger.info("Value: " + value);
 		logger.info("Date: " + date);
 		
-		Converter converter = new Converter(value, currencyName, date, new NbpApiHandler());
-		converter.setDatabase(database);
+		Converter converter = new Converter(value, currencyName, date, new NbpApiHandler(), database);
+//		converter.setDatabase(database);
 		converter.convert();
 		
 		return converter;

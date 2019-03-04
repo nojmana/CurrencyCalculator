@@ -35,7 +35,7 @@ public class Converter {
 	private Double convertedValue;
 	
 	
-	public Converter(String value, String currencyName, String date, NbpApiHandler nbpApiHandler) {
+	public Converter(String value, String currencyName, String date, NbpApiHandler nbpApiHandler, Database database) {
 		this.currencyName = currencyName;
 		try {
 			this.value = Double.parseDouble(value);
@@ -51,7 +51,8 @@ public class Converter {
 			throw myException;
 		}
 		
-		this.nbpApiHandler = new NbpApiHandler();
+		this.nbpApiHandler = nbpApiHandler;
+		this.database = database;
 	}
 
 	public Database getDatabase() {

@@ -29,6 +29,8 @@ public class NbpApiHandler {
 		logger.info("Connecting to: " + fullURL);
 
 		HttpURLConnection request = connectToAPI();
+		request.setConnectTimeout(3000);
+		request.setReadTimeout(3000);
 		InputStream inputStream;
 		try {
 			inputStream = request.getInputStream();
@@ -70,10 +72,9 @@ public class NbpApiHandler {
 		HttpURLConnection request = null;
 		try {
 			url = new URL(this.fullURL);
-//			request = (HttpURLConnection) url.openConnection(proxy);
-			request = (HttpURLConnection) url.openConnection();
+			request = (HttpURLConnection) url.openConnection(proxy);
+//			request = (HttpURLConnection) url.openConnection();
 			request.setRequestProperty("Accept", "application/json");
-			request.setConnectTimeout(3000);
 			request.connect();
 		} catch (java.net.SocketTimeoutException e) {
 			throw new MyException(408, "Accessing API is taking longer than expected. Try again", e);
