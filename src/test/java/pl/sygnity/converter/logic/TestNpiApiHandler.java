@@ -1,5 +1,6 @@
 package pl.sygnity.converter.logic;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,22 +21,29 @@ public class TestNpiApiHandler {
 	private Converter converter;
 	private DateTimeFormatter formatter;
 	private NbpApiHandler mockNbpApiHandler;
+	private Database mockDatabase;
 	
 	@Before
 	public void setUp() {
 		this.formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+		mockNbpApiHandler = mock(NbpApiHandler.class);
+		mockDatabase = mock(Database.class);
 	}
 	
+
 	@Test
 	public void TestGetConverterValueConvertEURRateFromAPI() {
 		String currencyName = "EUR";
-		String date = "2019-01-02";
-		String  value = "4.3016";
-		mockNbpApiHandler = mock(NbpApiHandler.class);
-//		when (mockDatabase.findCurrencyIdInDatabase(currencyName)).thenReturn(0);
-		when (mockNbpApiHandler.getConverterValue(currencyName, LocalDate.parse(date, formatter))).thenReturn(Double.valueOf(value));
-		converter = new Converter(value, currencyName, date, mockNbpApiHandler);
+		String dateString = "2019-01-02";
+		LocalDate date = LocalDate.parse(dateString, formatter);
+		String value = "10";
+		String converterValue = "4.3016";
+		when (mockNbpApiHandler.getConverterValue(currencyName, date)).thenReturn(Double.valueOf(value));
+		when (mockDatabase.findCurrencyIdInDatabase(currencyName)).thenReturn(0);
+		converter = new Converter(value, currencyName, dateString, mockNbpApiHandler);
 		
-//		Double result = converter.getConverterValue(currencyName, date);
+		Double result = converter.getConverterValue(currencyName, date);
+		Double expectedValue = Double.valueOf(value) / Double.valueOf(converterValue);
+		assertEquals(result, expectedValue);
 	}
 }

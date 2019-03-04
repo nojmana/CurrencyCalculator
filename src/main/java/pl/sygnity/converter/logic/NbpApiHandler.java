@@ -34,7 +34,7 @@ public class NbpApiHandler {
 			inputStream = request.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new MyException(404, "Cannot access API at given URL", e);
+			throw new MyException(404, "API does not provide rate for this date", e);
 		}
 
 		BufferedReader reader;
@@ -70,10 +70,13 @@ public class NbpApiHandler {
 		HttpURLConnection request = null;
 		try {
 			url = new URL(this.fullURL);
-			request = (HttpURLConnection) url.openConnection(proxy);
-//			request = (HttpURLConnection) url.openConnection();
+//			request = (HttpURLConnection) url.openConnection(proxy);
+			request = (HttpURLConnection) url.openConnection();
 			request.setRequestProperty("Accept", "application/json");
+			request.setConnectTimeout(3000);
 			request.connect();
+		} catch (java.net.SocketTimeoutException e) {
+			throw new MyException(408, "Accessing API is taking longer than expected. Try again", e);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			throw new MyException(404, "Malformed URL", e);

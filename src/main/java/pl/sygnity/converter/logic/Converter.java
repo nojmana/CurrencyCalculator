@@ -86,7 +86,6 @@ public class Converter {
 		Rate rate = new Rate();
 		rate.setDate(date);
 		Currency currency = new Currency(currencyName);
-		
 		Integer currencyId = this.database.findCurrencyIdInDatabase(currencyName);
 		
 		if (currencyId == 0) {
