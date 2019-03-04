@@ -72,8 +72,8 @@ public class NbpApiHandler {
 		HttpURLConnection request = null;
 		try {
 			url = new URL(this.fullURL);
-			request = (HttpURLConnection) url.openConnection(proxy);
-//			request = (HttpURLConnection) url.openConnection();
+//			request = (HttpURLConnection) url.openConnection(proxy);
+			request = (HttpURLConnection) url.openConnection();
 			request.setRequestProperty("Accept", "application/json");
 			request.connect();
 		} catch (java.net.SocketTimeoutException e) {

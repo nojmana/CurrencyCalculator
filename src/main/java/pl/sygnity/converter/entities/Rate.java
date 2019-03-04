@@ -52,4 +52,15 @@ public class Rate {
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
+
+	
+	public Rate(Currency currency, Double converter, LocalDate date) {
+		super();
+		this.currency = currency;
+		this.converter = converter;
+		this.date = date;
+	}
+	
+	public Rate() {}
+	
 }
