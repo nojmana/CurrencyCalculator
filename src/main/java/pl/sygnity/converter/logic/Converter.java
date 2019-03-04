@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import javax.persistence.Access;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +26,7 @@ public class Converter {
 	@JsonProperty
 	private LocalDate date;
 	
+	@JsonIgnore
 	private NbpApiHandler nbpApiHandler;
 	@JsonIgnore
 	private Database database;
@@ -36,7 +35,7 @@ public class Converter {
 	private Double convertedValue;
 	
 	
-	public Converter(String value, String currencyName, String date) {
+	public Converter(String value, String currencyName, String date, NbpApiHandler nbpApiHandler) {
 		this.currencyName = currencyName;
 		try {
 			this.value = Double.parseDouble(value);

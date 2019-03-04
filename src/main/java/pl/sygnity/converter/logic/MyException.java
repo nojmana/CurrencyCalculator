@@ -13,7 +13,6 @@ public class MyException extends RuntimeException {
     private Instant timestamp;
 
 	public MyException(int code, String message, Throwable cause) {
-//		super();
 		super(cause);
 		this.code = code;
 		this.message = message;
