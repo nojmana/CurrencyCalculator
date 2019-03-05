@@ -21,7 +21,7 @@ public class TestNbpApiHandler {
 	}
 	
 	@Test
-	public void TestGetEURRate() {
+	public void testGetEURRate() {
 		String currencyName = "EUR";
 		String dateString = "2019-01-02";
 		Double expectedConverterValue = Double.valueOf("4.3016");
@@ -31,7 +31,7 @@ public class TestNbpApiHandler {
 	}
 	
 	@Test
-	public void TestGetUSDRate() {
+	public void testGetUSDRate() {
 		String currencyName = "USD";
 		String dateString = "2019-01-02";
 		Double expectedConverterValue = Double.valueOf("3.7619");
@@ -41,7 +41,7 @@ public class TestNbpApiHandler {
 	}
 
 	@Test(expected = MyException.class)
-	public void TestGetRateFutureDate() {
+	public void testGetRateFutureDate() {
 		String currencyName = "USD";
 		String dateString = "9999-01-02";
 		LocalDate date = LocalDate.parse(dateString, formatter);
@@ -49,10 +49,11 @@ public class TestNbpApiHandler {
 	}
 	
 	@Test(expected = MyException.class)
-	public void TestGetRateNotExistingCurrency() {
+	public void testGetRateNotExistingCurrency() {
 		String currencyName = "TestTest";
 		String dateString = "2018-01-02";
 		LocalDate date = LocalDate.parse(dateString, formatter);
 		nbpApiHandler.getConverterValue(currencyName, date);
 	}
+	
 }

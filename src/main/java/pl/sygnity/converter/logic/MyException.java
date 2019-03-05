@@ -4,9 +4,6 @@ import java.time.Instant;
 
 public class MyException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2514070201008093584L;
 	private int code;
 	private String message;

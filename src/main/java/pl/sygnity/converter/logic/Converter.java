@@ -73,13 +73,12 @@ public class Converter {
 
 	public void convert() {
 		this.convertedValue = this.value;
-
+				
 		if (!this.currencyName.equals("EUR")) {
 			logger.info("CurrencyName != EUR");
-			this.convertedValue /= this.getConverterValue("EUR", this.date);
+			this.convertedValue *= this.getConverterValue(this.currencyName, this.date) / this.getConverterValue("EUR", this.date);
 		}
-
-		this.convertedValue *= this.getConverterValue(this.currencyName, this.date);
+		
 		logger.info("Converted to: " + convertedValue);
 	}
 	

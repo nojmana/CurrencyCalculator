@@ -20,5 +20,5 @@ public class MyErrorController {
 		MyException myException = new MyException(400, "Handler not found", e);
 		return new MyExceptionResponse(myException);
 	}
+	
 }
-

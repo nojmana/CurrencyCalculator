@@ -40,9 +40,8 @@ public class NbpApiHandler {
 		}
 
 		BufferedReader reader;
-		String json = "";
 		reader = new BufferedReader(new InputStreamReader(inputStream));
-		json = new String();
+		String json = new String();
 		String line;
 		try {
 			while ((line = reader.readLine()) != null) {
@@ -72,8 +71,8 @@ public class NbpApiHandler {
 		HttpURLConnection request = null;
 		try {
 			url = new URL(this.fullURL);
-//			request = (HttpURLConnection) url.openConnection(proxy);
-			request = (HttpURLConnection) url.openConnection();
+			request = (HttpURLConnection) url.openConnection(proxy);
+//			request = (HttpURLConnection) url.openConnection();			// to connect outside the company
 			request.setRequestProperty("Accept", "application/json");
 			request.connect();
 		} catch (java.net.SocketTimeoutException e) {
