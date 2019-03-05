@@ -42,12 +42,12 @@ public class Database {
 		this.rateRepository.save(rate);
 	}
 	
-	public Double findConverterInDatabase(Integer currencyId, LocalDate date) {
-		Double converter = this.rateRepository.findRateByCurrencyAndDate(currencyId, date);
-		if (converter == null) {
+	public Double findRateValueInDatabase(Integer currencyId, LocalDate date) {
+		Double value = this.rateRepository.findRateByCurrencyAndDate(currencyId, date);
+		if (value == null) {
 			return Double.valueOf(0);
 		} else {
-			return converter;
+			return value;
 		}
 	}
 }

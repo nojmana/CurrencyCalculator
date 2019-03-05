@@ -57,11 +57,10 @@ public class TestDatabase {
 	}
 	
 	@Test
-	public void testAddAndFindConverter() {
-		Double foundConverterValue = this.database.findConverterInDatabase(this.expectedCurrency.getId(), 
+	public void testAddAndFindRate() {
+		Double foundRateValue= this.database.findRateValueInDatabase(this.expectedCurrency.getId(), 
 				LocalDate.parse("2019-01-01", formatter));
-		assertEquals(this.expectedRate.getConverter(), foundConverterValue);
+		assertEquals(this.expectedRate.getValue(), foundRateValue);
 	}
-
 
 }

@@ -24,7 +24,7 @@ public class Rate {
 	private Currency currency;
 	
 	@Column(nullable=false)
-	private Double converter;
+	private Double value;
 	
 	@Column(nullable=false)
 	private LocalDate date;
@@ -37,12 +37,12 @@ public class Rate {
 		this.currency = currency;
 	}
 
-	public Double getConverter() {
-		return converter;
+	public Double getValue() {
+		return value;
 	}
 
-	public void setConverter(Double converter) {
-		this.converter = converter;
+	public void setValue(Double value) {
+		this.value = value;
 	}
 
 	public LocalDate getDate() {
@@ -54,10 +54,10 @@ public class Rate {
 	}
 
 	
-	public Rate(Currency currency, Double converter, LocalDate date) {
+	public Rate(Currency currency, Double value, LocalDate date) {
 		super();
 		this.currency = currency;
-		this.converter = converter;
+		this.value = value;
 		this.date = date;
 	}
 	

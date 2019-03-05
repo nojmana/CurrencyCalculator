@@ -35,10 +35,10 @@ public class Converter {
 	private Double convertedValue;
 	
 	
-	public Converter(String value, String currencyName, String date, NbpApiHandler nbpApiHandler, Database database) {
+	public Converter(String valueString, String currencyName, String date, NbpApiHandler nbpApiHandler, Database database) {
 		this.currencyName = currencyName;
 		try {
-			this.value = Double.parseDouble(value);
+			this.value = Double.parseDouble(valueString);
 		} catch (NumberFormatException e) {
 			MyException myException = new MyException(400, "Error while parsing value", e);
 			throw myException;
@@ -76,13 +76,13 @@ public class Converter {
 				
 		if (!this.currencyName.equals("EUR")) {
 			logger.info("CurrencyName != EUR");
-			this.convertedValue *= this.getConverterValue(this.currencyName, this.date) / this.getConverterValue("EUR", this.date);
+			this.convertedValue *= this.getRateValue(this.currencyName, this.date) / this.getRateValue("EUR", this.date);
 		}
 		
 		logger.info("Converted to: " + convertedValue);
 	}
 	
-	public Double getConverterValue(String currencyName, LocalDate date) {
+	public Double getRateValue(String currencyName, LocalDate date) {
 		Rate rate = new Rate();
 		rate.setDate(date);
 		Currency currency = new Currency(currencyName);
@@ -90,23 +90,23 @@ public class Converter {
 		
 		if (currencyId == 0) {
 			logger.info("No " + currencyName + " currency in database");
-			rate.setConverter(this.nbpApiHandler.getConverterValue(currencyName, date));
+			rate.setValue(this.nbpApiHandler.getRateValue(currencyName, date));
 			rate.setCurrency(currency);
 			
 			this.database.addCurrency(currency);
 			this.database.addRate(rate);
 		} else {
 			logger.info(currencyName + " currency in database");
-			rate.setConverter(this.database.findConverterInDatabase(currencyId, date));
+			rate.setValue(this.database.findRateValueInDatabase(currencyId, date));
 			rate.setCurrency(this.database.findCurrencyInDatabase(currencyId));
 
-			if (rate.getConverter().compareTo(Double.valueOf(0)) > 0 ? false : true) {
+			if (rate.getValue().compareTo(Double.valueOf(0)) > 0 ? false : true) {
 				logger.info("No " + currencyName + "  rate in database");
-				rate.setConverter(this.nbpApiHandler.getConverterValue(currencyName, date));
+				rate.setValue(this.nbpApiHandler.getRateValue(currencyName, date));
 				this.database.addRate(rate);
 			}
 		}
-		return rate.getConverter();
+		return rate.getValue();
 	}
 	
 	

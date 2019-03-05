@@ -1,8 +1,10 @@
 package pl.sygnity.converter.logic;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,10 +33,10 @@ public class TestConverter {
 		String currencyName = "EUR";
 		String dateString = "2019-01-02";
 		String value = "10";
-		String converterValue = "4.3016";
+		String rateValue = "4.3016";
 		LocalDate date = LocalDate.parse(dateString, formatter);
 		when (mockDatabase.findCurrencyIdInDatabase(currencyName)).thenReturn(0);
-		when (mockNbpApiHandler.getConverterValue(currencyName, date)).thenReturn(Double.valueOf(converterValue));
+		when (mockNbpApiHandler.getRateValue(currencyName, date)).thenReturn(Double.valueOf(rateValue));
 		Converter converter = new Converter(value, currencyName, dateString, mockNbpApiHandler, mockDatabase);
 		converter.convert();
 		Double result = converter.getConvertedValue();
@@ -47,20 +49,20 @@ public class TestConverter {
 		String currencyName = "USD";
 		String dateString = "2019-02-04";
 		String value = "10";
-		String converterValueEUR = "4.2813";
-		String converterValueUSD = "3.7408";
+		String rateValueEUR = "4.2813";
+		String rateValueUSD = "3.7408";
 		LocalDate date = LocalDate.parse(dateString, formatter);
 		
 		when (mockDatabase.findCurrencyIdInDatabase("EUR")).thenReturn(0);
-		when (mockNbpApiHandler.getConverterValue("EUR", date)).thenReturn(Double.valueOf(converterValueEUR));
+		when (mockNbpApiHandler.getRateValue("EUR", date)).thenReturn(Double.valueOf(rateValueEUR));
 		
 		when (mockDatabase.findCurrencyIdInDatabase(currencyName)).thenReturn(0);
-		when (mockNbpApiHandler.getConverterValue(currencyName, date)).thenReturn(Double.valueOf(converterValueUSD));
+		when (mockNbpApiHandler.getRateValue(currencyName, date)).thenReturn(Double.valueOf(rateValueUSD));
 		
 		Converter converter = new Converter(value, currencyName, dateString, mockNbpApiHandler, mockDatabase);
 		converter.convert();
 		Double result = converter.getConvertedValue();
-		Double expectedValue = Double.valueOf(value) * Double.valueOf(converterValueUSD) / Double.valueOf(converterValueEUR);
+		Double expectedValue = Double.valueOf(value) * Double.valueOf(rateValueUSD) / Double.valueOf(rateValueEUR);
 		assertEquals(expectedValue, result);
 	}
 

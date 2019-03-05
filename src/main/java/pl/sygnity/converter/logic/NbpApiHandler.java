@@ -24,7 +24,7 @@ public class NbpApiHandler {
 	private String baseURL = "http://api.nbp.pl/api/exchangerates/rates/A/";
 	private String fullURL;
 
-	public Double getConverterValue(String currency, LocalDate date) {			
+	public Double getRateValue(String currency, LocalDate date) {			
 		fullURL = baseURL + currency + "/" + formatDate(date);
 		logger.info("Connecting to: " + fullURL);
 
@@ -57,9 +57,9 @@ public class NbpApiHandler {
 			
 		for (int i = 0; i < array.length();) {
 			JSONObject item = array.getJSONObject(i);
-			Double converter = (Double) item.get("mid");
-			logger.info(currency + " converter: " + converter);
-			return Double.valueOf(converter);
+			Double value = (Double) item.get("mid");
+			logger.info(currency + " rate value: " + value);
+			return Double.valueOf(value);
 		}
 		return Double.valueOf(0);
 	}

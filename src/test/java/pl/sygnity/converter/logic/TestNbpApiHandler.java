@@ -24,20 +24,20 @@ public class TestNbpApiHandler {
 	public void testGetEURRate() {
 		String currencyName = "EUR";
 		String dateString = "2019-01-02";
-		Double expectedConverterValue = Double.valueOf("4.3016");
+		Double expectedRateValue = Double.valueOf("4.3016");
 		LocalDate date = LocalDate.parse(dateString, formatter);
-		Double result = nbpApiHandler.getConverterValue(currencyName, date);
-		assertEquals(expectedConverterValue, result);
+		Double result = nbpApiHandler.getRateValue(currencyName, date);
+		assertEquals(expectedRateValue, result);
 	}
 	
 	@Test
 	public void testGetUSDRate() {
 		String currencyName = "USD";
 		String dateString = "2019-01-02";
-		Double expectedConverterValue = Double.valueOf("3.7619");
+		Double expectedRateValue = Double.valueOf("3.7619");
 		LocalDate date = LocalDate.parse(dateString, formatter);
-		Double result = nbpApiHandler.getConverterValue(currencyName, date);
-		assertEquals(expectedConverterValue, result);
+		Double result = nbpApiHandler.getRateValue(currencyName, date);
+		assertEquals(expectedRateValue, result);
 	}
 
 	@Test(expected = MyException.class)
@@ -45,7 +45,7 @@ public class TestNbpApiHandler {
 		String currencyName = "USD";
 		String dateString = "9999-01-02";
 		LocalDate date = LocalDate.parse(dateString, formatter);
-		nbpApiHandler.getConverterValue(currencyName, date);
+		nbpApiHandler.getRateValue(currencyName, date);
 	}
 	
 	@Test(expected = MyException.class)
@@ -53,7 +53,7 @@ public class TestNbpApiHandler {
 		String currencyName = "TestTest";
 		String dateString = "2018-01-02";
 		LocalDate date = LocalDate.parse(dateString, formatter);
-		nbpApiHandler.getConverterValue(currencyName, date);
+		nbpApiHandler.getRateValue(currencyName, date);
 	}
 	
 }
